@@ -13,8 +13,15 @@ jobs:
       checks: write
       statuses: write
     steps:
-      - uses: actions/checkout@v4
-      
+      - name: Checkout base repository
+        uses: actions/checkout@v4
+        
+      - name: Checkout PR
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+          path: pr-registry
+          
       - name: Set up Python
         uses: actions/setup-python@v4
         with:
@@ -31,6 +38,7 @@ jobs:
         with:
           files: |
             registry/**/*.json
+          sha: ${{ github.event.pull_request.head.sha }}
       
       - name: Create initial check
         id: create-check
@@ -66,14 +74,34 @@ jobs:
         run: python .github/scripts/validate_pypi.py
         env:
           CHANGED_FILES: ${{ steps.changed-files.outputs.all_changed_files }}
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          PR_WORKSPACE: ${{ github.workspace }}/pr-registry
           
       - name: Process validation results
         if: always()
         uses: actions/github-script@v7
         with:
           script: |
+            const fs = require('fs');
             const validateResult = process.env.VALIDATE_EXIT_CODE === '0';
+            
+            // 读取并发送评论
+            let commentBody = '';
+            try {
+              commentBody = fs.readFileSync('validation_comment.txt', 'utf8');
+            } catch (e) {
+              console.log('读取评论文件失败，使用默认消息');
+              commentBody = validateResult 
+                ? '✅ Registry 验证通过\n\n所有检查项目均已通过。'
+                : '❌ Registry 验证失败\n\n请检查日志了解详细信息。';
+            }
+            
+            // 发送评论
+            await github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: commentBody
+            });
             
             // 更新检查结果
             const title = validateResult ? '✅ Registry 验证通过' : '❌ Registry 验证失败';

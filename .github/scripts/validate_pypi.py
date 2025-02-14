@@ -51,6 +51,11 @@ def create_comment_body(results):
     return comment
 
 def main():
+    if 'PR_WORKSPACE' not in os.environ:
+        print("错误：未设置 PR_WORKSPACE 环境变量")
+        sys.exit(1)
+
+    pr_workspace = os.environ['PR_WORKSPACE']
     exit_code = 0
     results = []
     
@@ -58,11 +63,13 @@ def main():
         if not file_path.startswith('registry/') or not file_path.endswith('.json'):
             continue
             
-        print(f"Checking {file_path}...")
+        # 使用 PR 工作区的文件路径
+        pr_file_path = os.path.join(pr_workspace, file_path)
+        print(f"Checking {pr_file_path}...")
         result = {}
         
         try:
-            with open(file_path, 'r', encoding='utf-8') as f:
+            with open(pr_file_path, 'r', encoding='utf-8') as f:
                 data = json.load(f)
                 
             # 复制基本信息
