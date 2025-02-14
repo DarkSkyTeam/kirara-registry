@@ -1,0 +1,6 @@
+{
+  "name": "onebot",
+  "description": "onebot适配器",
+  "author": "cloxl",
+  "pypiPackage": "chatgpt-mirai-qq-bot-onebot-adapter"
+}
