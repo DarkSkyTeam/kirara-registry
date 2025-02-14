@@ -47,36 +47,6 @@ def create_comment_body(results):
     
     return comment
 
-def post_comment(body):
-    if 'GITHUB_TOKEN' not in os.environ or 'GITHUB_REPOSITORY' not in os.environ or 'GITHUB_EVENT_PATH' not in os.environ:
-        print("未在 GitHub Actions 环境中运行，跳过评论发布")
-        print("评论内容预览：")
-        print(body)
-        return
-
-    event_path = os.environ['GITHUB_EVENT_PATH']
-    with open(event_path, 'r') as f:
-        event_data = json.load(f)
-    
-    if 'pull_request' not in event_data:
-        print("未在 Pull Request 环境中运行，跳过评论发布")
-        return
-        
-    pr_number = event_data['pull_request']['number']
-    repo = os.environ['GITHUB_REPOSITORY']
-    token = os.environ['GITHUB_TOKEN']
-    
-    url = f"https://api.github.com/repos/{repo}/issues/{pr_number}/comments"
-    headers = {
-        'Authorization': f'token {token}',
-        'Accept': 'application/vnd.github.v3+json'
-    }
-    
-    response = requests.post(url, headers=headers, json={'body': body})
-    if response.status_code != 201:
-        print(f"发布评论失败: {response.status_code}")
-        print(response.text)
-
 def main():
     exit_code = 0
     results = []
@@ -122,10 +92,11 @@ def main():
             
         results.append(result)
     
-    # 生成并发布评论
+    # 生成评论内容并保存到文件
     if results:
         comment_body = create_comment_body(results)
-        post_comment(comment_body)
+        with open('validation_comment.txt', 'w', encoding='utf-8') as f:
+            f.write(comment_body)
     
     sys.exit(exit_code)
 
