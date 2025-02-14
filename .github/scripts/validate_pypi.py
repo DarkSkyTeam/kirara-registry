@@ -41,7 +41,10 @@ def create_comment_body(results):
         name = name.replace('|', '\\|')
         description = description.replace('|', '\\|')
         author = author.replace('|', '\\|')
-        pypi_package = pypi_package.replace('|', '\\|')
+        
+        # 为 PyPI 包名添加链接
+        if pypi_package != 'N/A':
+            pypi_package = f"[{pypi_package}](https://pypi.org/project/{pypi_package}/)"
         
         comment += f"| {name} | {description} | {author} | {pypi_package} | {status} |\n"
     
