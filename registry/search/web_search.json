@@ -1,0 +1,6 @@
+{
+  "name": "web_search",
+  "description": "通过关键字进行网页搜索",
+  "author": "chuansir",
+  "pypiPackage": "chatgpt-mirai-qq-bot-web-search"
+}
