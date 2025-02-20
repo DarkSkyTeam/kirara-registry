@@ -1,0 +1,6 @@
+{
+  "name": "web_image_generate",
+  "description": "通过提示词进行画图",
+  "author": "chuansir",
+  "pypiPackage": "chatgpt-mirai-qq-bot-web-image-generate"
+}
