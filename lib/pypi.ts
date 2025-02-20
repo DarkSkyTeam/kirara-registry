@@ -1,3 +1,4 @@
+import { Plugin } from "./types"
 interface PyPIInfo {
   version: string
   description: string
@@ -5,10 +6,13 @@ interface PyPIInfo {
   homePage: string
 }
 
-import fetch from "node-fetch"
-
-export async function fetchPyPIInfo(packageName: string): Promise<PyPIInfo> {
-  const response = await fetch(`https://pypi.org/pypi/${packageName}/json`)
+export async function fetchPyPIInfo(plugin: Plugin): Promise<PyPIInfo> {
+  const response = await fetch(`https://pypi.org/pypi/${plugin.pypiPackage}/json`, {
+    next: {
+      revalidate: 60 * 60 * 24, // 24 hours
+      tags: [`plugins:${plugin.name}`, 'plugins'],
+    },
+  })
   const data = await response.json()
 
   return {

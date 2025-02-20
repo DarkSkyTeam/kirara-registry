@@ -9,12 +9,12 @@
 - 支持插件搜索和分页浏览
 - 提供 Web UI 和 API 接口
 - 支持插件版本自动更新检测
-- 支持多种缓存后端（文件系统和 Vercel Blob）
+- 基于 Vercel Data Cache 的高性能缓存系统
 
 ## 如何提交插件
 
 1. Fork 本仓库
-2. 在 `registry` 目录下创建一个新的 JSON 文件，文件名格式建议为 `{分类}/{插件名}.json`
+2. 在 `registry` 目录下创建一个新的 JSON 文件，文件名格式建议为 `{作者}/{插件名}.json`
 3. JSON 文件格式如下：
 
 ```json
@@ -94,12 +94,12 @@ GET /api/v1/info/{插件名称}
 1. 克隆仓库
 ```bash
 git clone https://github.com/DarkSkyTeam/kirara-registry
-cd kirara-registry
+cd plugin-registry
 ```
 
 2. 安装依赖
 ```bash
-bun install
+npm install
 ```
 
 3. 创建环境变量文件
@@ -111,17 +111,11 @@ cp .env.example .env.local
 ```bash
 # API Key for admin operations
 API_KEY=your_api_key_here
-
-# Cache backend type: "file" or "vercel"
-CACHE_BACKEND=file
-
-# Vercel Blob configuration (required if CACHE_BACKEND=vercel)
-BLOB_READ_WRITE_TOKEN=your_blob_read_write_token_here
 ```
 
 5. 启动开发服务器
 ```bash
-bun run dev
+npm run dev
 ```
 
 6. 访问 http://localhost:3000
@@ -132,12 +126,8 @@ bun run dev
 
 1. 在 Vercel 项目设置中配置以下环境变量：
    - `API_KEY`: 管理员操作的 API 密钥
-   - `CACHE_BACKEND`: 设置为 "vercel"
-   - `BLOB_READ_WRITE_TOKEN`: Vercel Blob 存储的读写令牌
 
-2. 在 Vercel 控制台中创建一个 Blob Store 并获取上述配置信息
-
-3. 点击下方按钮一键部署：
+2. 点击下方按钮一键部署：
 
 [![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2FDarkSkyTeam%2Fkirara-registry)
 
@@ -147,7 +137,7 @@ bun run dev
 - TypeScript - 类型安全的 JavaScript
 - Tailwind CSS - 样式框架
 - Vercel - 部署平台
-- Vercel Blob - 对象存储服务
+- Vercel Data Cache - 内置缓存系统
 
 ## License
 
@@ -159,5 +149,4 @@ MIT License
 - [Vercel](https://vercel.com)
 - [Tailwind CSS](https://tailwindcss.com/)
 - [shadcn/ui](https://ui.shadcn.com/)
-- [Vercel Blob](https://vercel.com/storage/blob)
 

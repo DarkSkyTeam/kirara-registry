@@ -17,7 +17,7 @@ export interface CacheBackend {
   getAll(): Promise<Plugin[]>
 
   /**
-   * 清除所有缓存
+   * 使缓存失效
    */
-  clear(): Promise<void>
+  revalidate(name?: string): Promise<void>
 } 

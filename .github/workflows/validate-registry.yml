@@ -1,0 +1,125 @@
+name: Validate Registry
+
+on:
+  pull_request_target:
+    paths:
+    - 'registry/**/*.json'
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    permissions:
+      pull-requests: write
+      checks: write
+      statuses: write
+    steps:
+      - name: Checkout base repository
+        uses: actions/checkout@v4
+        
+      - name: Checkout PR
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+          path: pr-registry
+          
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.x'
+          
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install requests
+          
+      - name: Get changed files
+        id: changed-files
+        uses: tj-actions/changed-files@v41
+        with:
+          files: |
+            registry/**/*.json
+          sha: ${{ github.event.pull_request.head.sha }}
+      
+      - name: Create initial check
+        id: create-check
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const check = await github.rest.checks.create({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              name: 'Registry Validation',
+              head_sha: context.payload.pull_request.head.sha,
+              status: 'in_progress',
+              output: {
+                title: '🔄 Registry 验证进行中',
+                summary: '正在验证 Registry 文件...'
+              }
+            });
+            return check.data.id;
+      
+      - name: Add pending label
+        uses: actions/github-script@v7
+        with:
+          script: |
+            await github.rest.issues.addLabels({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              labels: ['Plugin']
+            });
+            
+      - name: Validate PyPI packages
+        id: validate
+        run: python .github/scripts/validate_pypi.py
+        env:
+          CHANGED_FILES: ${{ steps.changed-files.outputs.all_changed_files }}
+          PR_WORKSPACE: ${{ github.workspace }}/pr-registry
+          
+      - name: Process validation results
+        if: always()
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            const validateResult = process.env.VALIDATE_EXIT_CODE === '0';
+            
+            // 读取并发送评论
+            let commentBody = '';
+            try {
+              commentBody = fs.readFileSync('validation_comment.txt', 'utf8');
+            } catch (e) {
+              console.log('读取评论文件失败，使用默认消息');
+              commentBody = validateResult 
+                ? '✅ Registry 验证通过\n\n所有检查项目均已通过。'
+                : '❌ Registry 验证失败\n\n请检查日志了解详细信息。';
+            }
+            
+            // 发送评论
+            await github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: commentBody
+            });
+            
+            // 更新检查结果
+            const title = validateResult ? '✅ Registry 验证通过' : '❌ Registry 验证失败';
+            const summary = validateResult 
+              ? '所有检查项目均已通过，可以继续合并。' 
+              : '发现问题，请查看评论了解详情。';
+            
+            await github.rest.checks.update({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              check_run_id: Number(process.env.CHECK_RUN_ID),
+              status: 'completed',
+              conclusion: validateResult ? 'success' : 'failure',
+              output: {
+                title: title,
+                summary: summary
+              }
+            });
+        env:
+          VALIDATE_EXIT_CODE: ${{ steps.validate.outcome == 'success' && '0' || '1' }}
+          CHECK_RUN_ID: ${{ steps.create-check.outputs.result }} 

@@ -1,91 +1,51 @@
-import { put, del, list, get } from '@vercel/blob'
+import { revalidateTag } from "next/cache"
 import { Plugin } from "../types"
 import { CacheBackend } from "./types"
+import { readPlugins } from "../fileSystem"
+import { fetchPyPIInfo } from "../pypi"
 
-const PLUGIN_PREFIX = "plugins/"
-const PLUGIN_LIST_FILE = "plugins/list.json"
-
-export class VercelCacheBackend implements CacheBackend {
-    private getKey(name: string): string {
-        return `${PLUGIN_PREFIX}${name}.json`
-    }
-
+export class VercelDataCache implements CacheBackend {
     async get(name: string): Promise<Plugin | null> {
+        const plugins = await readPlugins()
+        const plugin = plugins.find(p => p.name === name)
+        if (!plugin) return null
+
         try {
-            const blob = await get(this.getKey(name))
-            if (!blob) return null
-            const text = await blob.text()
-            return JSON.parse(text) as Plugin
+            const pypiInfo = await fetchPyPIInfo(plugin)
+            return { ...plugin, pypiInfo }
         } catch (error) {
-            console.error(`Error getting plugin ${name}:`, error)
-            return null
+            console.error(`Error fetching PyPI info for ${name}:`, error)
+            return plugin
         }
     }
 
     async set(name: string, plugin: Plugin): Promise<void> {
-        // 保存插件数据
-        await put(this.getKey(name), JSON.stringify(plugin), {
-            access: 'public',
-            addRandomSuffix: false
-        })
-
-        // 更新插件列表
-        let pluginNames: string[] = []
-        try {
-            const listBlob = await get(PLUGIN_LIST_FILE)
-            if (listBlob) {
-                const text = await listBlob.text()
-                pluginNames = JSON.parse(text)
-            }
-        } catch (error) {
-            console.error("Error reading plugin list:", error)
-        }
-
-        if (!pluginNames.includes(name)) {
-            pluginNames.push(name)
-            await put(PLUGIN_LIST_FILE, JSON.stringify(pluginNames), {
-                access: 'public',
-                addRandomSuffix: false
-            })
-        }
+        // 在 Vercel Data Cache 中，我们不需要手动设置缓存
+        // 缓存会通过 fetch 请求自动处理
+        return
     }
 
     async getAll(): Promise<Plugin[]> {
-        try {
-            const listBlob = await get(PLUGIN_LIST_FILE)
-            if (!listBlob) return []
-
-            const text = await listBlob.text()
-            const pluginNames = JSON.parse(text) as string[]
-
-            const plugins = await Promise.all(
-                pluginNames.map(name => this.get(name))
-            )
-
-            return plugins.filter((plugin): plugin is Plugin => plugin !== null)
-        } catch (error) {
-            console.error("Error getting all plugins:", error)
-            return []
-        }
+        const plugins = await readPlugins()
+        const pluginsWithPyPIInfo = await Promise.all(
+            plugins.map(async (plugin: Plugin) => {
+                try {
+                    const pypiInfo = await fetchPyPIInfo(plugin)
+                    return { ...plugin, pypiInfo }
+                } catch (error) {
+                    console.error(`Error fetching PyPI info for ${plugin.name}:`, error)
+                    return plugin
+                }
+            })
+        )
+        return pluginsWithPyPIInfo
     }
 
-    async clear(): Promise<void> {
-        try {
-            const listBlob = await get(PLUGIN_LIST_FILE)
-            if (!listBlob) return
-
-            const text = await listBlob.text()
-            const pluginNames = JSON.parse(text) as string[]
-
-            // 删除所有插件文件
-            await Promise.all(
-                pluginNames.map(name => del(this.getKey(name)))
-            )
-
-            // 删除插件列表
-            await del(PLUGIN_LIST_FILE)
-        } catch (error) {
-            console.error("Error clearing cache:", error)
+    async revalidate(name?: string): Promise<void> {
+        if (name) {
+            await revalidateTag(`plugins:${name}`)
+        } else {
+            await revalidateTag("plugins")
         }
     }
 } 
