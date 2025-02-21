@@ -1,6 +1,6 @@
 {
   "name": "web_search",
-  "description": "通过关键字进行网页搜索",
+  "description": "通过关键字进行bing网页搜索,支持设置max_results(最大搜索结果数量),timeout(超时秒数)和fetch_content(是否打开搜索内页)",
   "author": "chuansir",
   "pypiPackage": "chatgpt-mirai-qq-bot-web-search"
 }

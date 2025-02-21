@@ -1,6 +1,6 @@
 {
   "name": "web_image_generate",
-  "description": "通过提示词进行画图",
+  "description": "通过提示词进行画图,目前支持modelscope和shakker平台(需要获取cookie)，其中modelscope支持flux和ketu模型，shakker支持anime和photo模型",
   "author": "chuansir",
   "pypiPackage": "chatgpt-mirai-qq-bot-web-image-generate"
 }
