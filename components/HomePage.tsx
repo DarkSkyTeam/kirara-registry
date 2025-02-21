@@ -14,7 +14,7 @@ export default function HomePage() {
     setAlertInfo({ isOpen: true, title, message })
   }
 
-  const { plugins, currentPage, totalPages, searchTerm, setSearchTerm, handleSearch, handlePageChange } = usePlugins({ onAlert: showAlert })
+  const { plugins, currentPage, totalPages, searchTerm, setSearchTerm, handleSearch, handlePageChange, isLoading } = usePlugins({ onAlert: showAlert })
 
   return (
     <Layout>
@@ -30,7 +30,7 @@ export default function HomePage() {
           />
           <Button onClick={() => handleSearch(searchTerm, 1)}>搜索</Button>
         </div>
-        <PluginList plugins={plugins} />
+        <PluginList plugins={plugins} isLoading={isLoading} />
         <Pagination currentPage={currentPage} totalPages={totalPages} onPageChange={handlePageChange} />
       </div>
     </Layout>
