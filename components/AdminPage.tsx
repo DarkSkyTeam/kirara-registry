@@ -16,10 +16,9 @@ export default function AdminPage() {
   const showAlert = (title: string, message: string) => {
     setAlertInfo({ isOpen: true, title, message })
   }
-  const { plugins, currentPage, totalPages, searchTerm, setSearchTerm, handleSearch, handlePageChange, refreshCache } = usePlugins({ isAdmin: true, onAlert: showAlert })
+  const { plugins, currentPage, totalPages, searchTerm, setSearchTerm, handleSearch, handlePageChange, refreshCache, isLoading } = usePlugins({ isAdmin: true, onAlert: showAlert })
   const { isLoggedIn } = useAuth()
   const router = useRouter()
-
 
   useEffect(() => {
     if (!isLoggedIn) {
@@ -45,7 +44,7 @@ export default function AdminPage() {
           />
           <Button onClick={() => handleSearch(searchTerm, 1)}>搜索</Button>
         </div>
-        <PluginList plugins={plugins} isAdmin={true} onRefreshCache={refreshCache} />
+        <PluginList plugins={plugins} isAdmin={true} onRefreshCache={refreshCache} isLoading={isLoading} />
         <Pagination currentPage={currentPage} totalPages={totalPages} onPageChange={handlePageChange} />
       </div>
       <Alert
