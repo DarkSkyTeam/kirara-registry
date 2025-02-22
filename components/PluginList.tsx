@@ -2,7 +2,7 @@
 import { useState } from "react"
 import { Button } from "@/components/ui/button"
 
-import type { Plugin } from '@/lib/fileSystem'
+import type { Plugin } from '@/lib/types'
 import { InstallModal } from "./InstallModal"
 
 interface PluginListProps {
@@ -61,7 +61,7 @@ export function PluginList({ plugins, isAdmin = false, onRefreshCache, isLoading
             <SkeletonCard />
           </>
         ) : (
-          plugins.map((plugin) => (
+          plugins.map((plugin: Plugin) => (
             <div key={plugin.name} className="bg-white p-4 rounded-lg shadow-md flex flex-col justify-between plugin-card">
               <div>
                 <h2 className="text-xl font-semibold text-gray-900">{plugin.name}</h2>
@@ -70,14 +70,28 @@ export function PluginList({ plugins, isAdmin = false, onRefreshCache, isLoading
                 <p className="text-sm text-gray-500">PyPI 包名: {plugin.pypiPackage}</p>
                 <p className="text-sm text-gray-500">最新版本: {plugin.pypiInfo?.version ?? 'Unknown'}</p>
               </div>
-              <div className="flex justify-end mt-4">
-                {plugin.pypiInfo?.homePage && (
-                  <Button variant="outline" onClick={() => window.open(plugin.pypiInfo?.homePage, '_blank')} className="mr-2">
-                    项目主页
-                  </Button>
-                )}
-                <Button onClick={() => showInstallModal(plugin)} className="mr-2">安装</Button>
-                {isAdmin && <Button onClick={() => onRefreshCache?.(plugin.name)}>刷新缓存</Button>}
+              <div className="flex justify-between mt-4">
+                <div className="flex">
+                  {plugin.pypiInfo?.homePage && (
+                    <Button variant="outline" onClick={() => window.open(plugin.pypiInfo?.homePage, '_blank')} className="mr-2">
+                      项目主页
+                    </Button>
+                  )}
+                  {plugin.pypiInfo?.bugTrackerUrl && (
+                    <Button variant="outline" onClick={() => window.open(plugin.pypiInfo?.bugTrackerUrl, '_blank')} className="mr-2">
+                      问题反馈
+                    </Button>
+                  )}
+                  {plugin.pypiInfo?.documentUrl && (
+                    <Button variant="outline" onClick={() => window.open(plugin.pypiInfo?.documentUrl, '_blank')} className="mr-2">
+                      使用文档
+                    </Button>
+                  )}
+                </div>
+                <div className="flex">
+                  <Button onClick={() => showInstallModal(plugin)} className="mr-2">安装</Button>
+                  {isAdmin && <Button onClick={() => onRefreshCache?.(plugin.name)}>刷新缓存</Button>}
+                </div>
               </div>
             </div>
           ))

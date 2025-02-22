@@ -1,10 +1,5 @@
-import { Plugin } from "./types"
-interface PyPIInfo {
-  version: string
-  description: string
-  author: string
-  homePage: string
-}
+import { Plugin, PyPIInfo } from "./types"
+
 
 export async function fetchPyPIInfo(plugin: Plugin): Promise<PyPIInfo> {
   const response = await fetch(`https://pypi.org/pypi/${plugin.pypiPackage}/json`, {
@@ -20,6 +15,8 @@ export async function fetchPyPIInfo(plugin: Plugin): Promise<PyPIInfo> {
     description: data.info.summary,
     author: data.info.author,
     homePage: data.info.home_page,
+    bugTrackerUrl: data.info.project_urls['Bug Tracker'],
+    documentUrl: data.info.project_urls['Documentation'],
   }
 }
 

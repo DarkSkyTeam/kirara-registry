@@ -1,24 +1,9 @@
 import fs from "fs/promises"
 import path from "path"
 import { createHash } from "crypto"
-
+import { type Plugin } from "./types"
 const REGISTRY_DIR = path.join(process.cwd(), "registry")
 const CACHE_DIR = path.join(process.cwd(), ".cache")
-
-export interface PyPIInfo {
-  version: string
-  description: string
-  author: string
-  homePage: string
-}
-
-export interface Plugin {
-  name: string
-  description: string
-  author: string
-  pypiPackage: string
-  pypiInfo?: PyPIInfo // 可选字段
-}
 
 /**
  * 计算字符串的 sha1 哈希值

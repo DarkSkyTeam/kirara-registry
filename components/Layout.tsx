@@ -18,6 +18,9 @@ export function Layout({ children }: { children: React.ReactNode }) {
               </Link>
             </div>
             <div className="flex items-center">
+              <Link href="https://github.com/DarkSkyTeam/kirara-registry" className="text-gray-700 hover:text-gray-900 mr-4">
+                提交插件
+              </Link>
               {isLoggedIn ? (
                 <>
                   <Link href="/admin" className="text-gray-700 hover:text-gray-900 mr-4">

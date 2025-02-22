@@ -43,9 +43,9 @@ export function InstallModal({ plugin, onClose }: InstallModalProps) {
                 在 WebUI 界面中，进入 "插件管理" 页面，点击 "安装插件"，然后输入以下插件名称进行安装:
               </p>
               <div className="mt-2 flex items-center justify-between bg-gray-100 rounded-md p-2">
-                <code className="text-sm text-gray-900">{plugin.name}</code>
+                <code className="text-sm text-gray-900">{plugin.pypiPackage}</code>
                 <Button
-                  onClick={() => handleCopyToClipboard(plugin.name, setIsCopied1)}
+                  onClick={() => handleCopyToClipboard(plugin.pypiPackage, setIsCopied1)}
                   variant="outline"
                   size="sm"
                 >

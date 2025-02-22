@@ -2,13 +2,7 @@
 
 import { useState, useEffect } from "react"
 import { useSearchParams } from "next/navigation"
-
-interface Plugin {
-  name: string
-  description: string
-  author: string
-  pypiPackage: string
-}
+import { type Plugin } from "../lib/types"
 
 interface UsePluginsResult {
   plugins: Plugin[]
