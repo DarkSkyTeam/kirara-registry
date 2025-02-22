@@ -1,0 +1,6 @@
+{
+  "name": "music_search",
+  "description": "通过歌曲名和作者进行歌曲搜素，返回歌曲直链和歌词，支持设置的优先平台:酷美,网易,qq,酷狗,咪咕",
+  "author": "chuansir",
+  "pypiPackage": "chatgpt-mirai-qq-bot-music-search"
+}
