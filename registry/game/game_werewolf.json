@@ -1,0 +1,6 @@
+{
+  "name": "game_werewolf",
+  "description": "llm狼人杀游戏，1女巫1预言家1守卫，可自定义村名和狼人数量，由人类随机扮演一个角色进行互动，默认工作流的前缀是#狼人杀，通过'#狼人杀开始'触发游戏",
+  "author": "chuansir",
+  "pypiPackage": "chatgpt-mirai-qq-bot-game-werewolf"
+}
