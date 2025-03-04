@@ -1,0 +1,6 @@
+{
+  "name": "scheduler",
+  "description": "提供新增定时任务，查询定时任务，删除定时任务及其聚合Block(同时也可以配置其他已安装的block实现自动调用)的插件，实现定时任务的增删查",
+  "author": "chuansir",
+  "pypiPackage": "chatgpt-mirai-qq-bot-scheduler"
+}
