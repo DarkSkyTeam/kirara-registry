@@ -1,0 +1,6 @@
+{
+  "name": "email",
+  "description": "提供收取未读邮件和发送邮件的block，首次发送或收取邮件请一并提供发件人邮箱和授权码（授权码获取路径：qq邮箱-设置-账号与安全-安全设置-开启服务-获取授权码）",
+  "author": "chuansir",
+  "pypiPackage": "kirara-ai-email"
+}
